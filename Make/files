@@ -1,0 +1,3 @@
+drivingForceMod/drivingForcesMod.C
+
+LIB = $(FOAM_USER_LIBBIN)/libABLForcing
