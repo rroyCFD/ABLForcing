@@ -111,13 +111,9 @@ template<class Type>
 class drivingForceMod
 {
     // Private data
-
-
         typedef GeometricField<Type, fvPatchField, volMesh> volFieldType;
 
-
         //- Constants
-
             //- Name
             const word name_;
 
@@ -128,7 +124,8 @@ class drivingForceMod
             const fvMesh& mesh_;
 
             //- Field pointer
-            const volFieldType& field_;
+            // const volFieldType& field_;
+            volFieldType& field_;
 
 
         //- Vertical mesh planes
@@ -292,7 +289,8 @@ public:
     (
         const IOdictionary& dict,
         const word& name,
-        const volFieldType& field
+        // const volFieldType& field
+        volFieldType& field
     );
 
 

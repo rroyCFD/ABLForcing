@@ -134,12 +134,20 @@ void Foam::drivingForceMod<Type>::updateComputedTimeDepSource_(bool writeIter)
     ds *= gain_;
 
     // Update the source term
+    scalar dsRatio = mag(fldMeanDesired)/mag(fldMean);
+
     forAll(bodyForce_,cellI)
     {
-        bodyForce_[cellI] = ds;
+        bodyForce_[cellI] += ds;
+        // assumes instantaneous, linear velocity profile
+        // log law profile for ABL shall be considered
+        // for velocity flux shall be updated as well
+        field_[cellI]     = field_[cellI] * dsRatio;
     }
 
     bodyForce_.correctBoundaryConditions();
+
+    Info << "Cumulative "<< bodyForce_.name() << ": " << bodyForce_[0] << endl;
 
     // Write the source information
     if (writeIter)
@@ -706,7 +714,8 @@ Foam::drivingForceMod<Type>::drivingForceMod
 (
     const IOdictionary& dict,
     const word& name,
-    const GeometricField<Type, fvPatchField, volMesh>& field
+    // const GeometricField<Type, fvPatchField, volMesh>& field
+    GeometricField<Type, fvPatchField, volMesh>& field
 )
 :
     // Set name
