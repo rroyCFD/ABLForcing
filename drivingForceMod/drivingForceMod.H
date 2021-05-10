@@ -193,6 +193,9 @@ class drivingForceMod
         //- Source writing frequency?
         int writeSourceInterval_;
 
+        // For computed bodyForce: adjust bodyForce to meet transport equation
+        // balance (i.e. achieve desired value)
+        Type ds_;
 
     // Private Member Functions
 
@@ -307,6 +310,12 @@ public:
         volFieldType& force()
         {
             return bodyForce_;
+        }
+
+        // Return adjestment for bodyforce
+        Type bodyForceAdjustMent()
+        {
+            return ds_;
         }
 
 };

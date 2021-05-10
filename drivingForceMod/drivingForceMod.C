@@ -121,38 +121,36 @@ void Foam::drivingForceMod<Type>::updateComputedTimeDepSource_(bool writeIter)
     Type fldMean = fldMean1 + (((fldMean2 - fldMean1)/(hLevels2 - hLevels1)) * (sourceHeightsSpecified_[0] - hLevels1));
 
 
-    // Compute the source term
-    Type ds = (fldMeanDesired - fldMean) / dt;
+    // Compute the source term (update every iteration of time-step; deficit after momentum prediction)
+    ds_ = (fldMeanDesired - fldMean) / dt;
 
     // Subtract off any vertical part
     if (setVerticalCompZero_)
     {
-        ds = subtractVerticalPart_(ds);
+        ds_ = subtractVerticalPart_(ds_);
     }
 
     // Apply the relaxation
-    ds *= gain_;
+    ds_ *= gain_;
 
     // Update the source term
     scalar dsRatio = mag(fldMeanDesired)/mag(fldMean);
 
     forAll(bodyForce_,cellI)
     {
-        bodyForce_[cellI] += ds;
+        bodyForce_[cellI] += ds_;
         // assumes instantaneous, linear velocity profile
         // log law profile for ABL shall be considered
         // for velocity flux shall be updated as well
         field_[cellI]     = field_[cellI] * dsRatio;
     }
-
     bodyForce_.correctBoundaryConditions();
-
-    Info << "Cumulative "<< bodyForce_.name() << ": " << bodyForce_[0] << endl;
 
     // Write the source information
     if (writeIter)
     {
-        writeSourceHistory_(ds);
+        writeSourceHistory_(bodyForce_[0]);
+        Info << "Adjustment to the "<< bodyForce_.name() << ": " << ds_ << endl;
     }
 }
 
@@ -752,7 +750,8 @@ Foam::drivingForceMod<Type>::drivingForceMod
     hLevels1I(0.0),
     hLevels2I(0.0),
     hLevels1(0.0),
-    hLevels2(0.0)
+    hLevels2(0.0),
+    ds_(zeroTensor_())
 {
     Info << "Creating driving force object for " << name_ << endl;
 
