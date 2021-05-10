@@ -195,7 +195,7 @@ class drivingForceMod
 
         // For computed bodyForce: adjust bodyForce to meet transport equation
         // balance (i.e. achieve desired value)
-        Type ds_;
+        dimensioned<Type> ds_;
 
     // Private Member Functions
 
@@ -313,7 +313,7 @@ public:
         }
 
         // Return adjestment for bodyforce
-        Type bodyForceAdjustMent()
+        const dimensioned<Type> bodyForceAdjustMent()
         {
             return ds_;
         }

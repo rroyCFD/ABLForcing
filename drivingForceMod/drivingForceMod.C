@@ -122,23 +122,23 @@ void Foam::drivingForceMod<Type>::updateComputedTimeDepSource_(bool writeIter)
 
 
     // Compute the source term (update every iteration of time-step; deficit after momentum prediction)
-    ds_ = (fldMeanDesired - fldMean) / dt;
+    ds_.value() = (fldMeanDesired - fldMean) / dt;
 
     // Subtract off any vertical part
     if (setVerticalCompZero_)
     {
-        ds_ = subtractVerticalPart_(ds_);
+        ds_.value() = subtractVerticalPart_(ds_.value());
     }
 
     // Apply the relaxation
-    ds_ *= gain_;
+    ds_.value() *= gain_;
 
     // Update the source term
     scalar dsRatio = mag(fldMeanDesired)/mag(fldMean);
 
     forAll(bodyForce_,cellI)
     {
-        bodyForce_[cellI] += ds_;
+        bodyForce_[cellI] += ds_.value();
         // assumes instantaneous, linear velocity profile
         // log law profile for ABL shall be considered
         // for velocity flux shall be updated as well
@@ -751,7 +751,7 @@ Foam::drivingForceMod<Type>::drivingForceMod
     hLevels2I(0.0),
     hLevels1(0.0),
     hLevels2(0.0),
-    ds_(zeroTensor_())
+    ds_(dimensioned<Type>("ds_" & name_, dimensionSet(field_.dimensions()/dimTime),zeroTensor_()))
 {
     Info << "Creating driving force object for " << name_ << endl;
 
